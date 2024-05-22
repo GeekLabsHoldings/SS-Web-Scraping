@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from time import sleep
 from datetime import datetime
 import pytz
+import re
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -57,8 +58,9 @@ def PostDetail(driver, AttachedPosts):
         WebDriverWait(driver, 4).until(EC.presence_of_element_located((By.XPATH, '//div[@class="text-neutral-content"]')))
         text = driver.find_element(By.XPATH, '//div[@class="text-neutral-content"]').text
         for i in range(len(TickerList)):
-            if TickerList[i] in text:
-                TickerCount[i] = TickerCount[i] + 1  
+            pattern = fr'\b{re.escape(TickerList[i])}\b'
+            if re.search(pattern, text):
+                TickerCount[i] = TickerCount[i] + 1
         AttachedPosts = AttachedPosts + 1
     except TimeoutException:
         pass
@@ -68,7 +70,8 @@ def PostComments(driver):
     for i in range(len(comments)):
         CommentText = comments[i].text
         for i in range(len(TickerList)):
-            if TickerList[i] in CommentText:
+            pattern = fr'\b{re.escape(TickerList[i])}\b'
+            if re.search(pattern, CommentText):
                 TickerCommentCount[i] = TickerCommentCount[i] + 1
         
 
@@ -111,5 +114,4 @@ for i in range(len(TickerList)):
 
 ##################################################################
 close = input("press any key to close the window")
-driver.quit() 
-
+driver.quit()
